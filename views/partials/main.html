@@ -1,1 +1,18 @@
-Main
+<div class="canvas-container">
+<canvas id="canvas" class="canvas" 
+  width="{{canvasWidth}}"
+  height="{{canvasHeight}}"
+  ></canvas>  
+</div>
+<div class="button-list">
+<!--<button class="button"><i class="fa fa-step-backward"></i></button>-->
+<button class="button" ng-click="play()"><i class="fa" ng-class="{'fa-play':paused, 'fa-pause':!paused}"></i></button>
+<!--<button class="button"><i class="fa fa-step-forward"></i></button>-->
+</div>
+<div class="log-container" ng-show="logs.length > 0">
+    <div class="log" width="{{canvasWidth}}">
+      <div ng-repeat="log in logs">
+        {{log.message}}
+      </div>  
+    </div>
+</div>

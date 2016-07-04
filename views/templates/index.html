@@ -1,8 +1,12 @@
 {% include 'layout.html' %}
 
 {% block body %}
+<nav class="nav">
+    <h1 class="nav-title">Legion</h1>
+</nav>    
+<div class="main">
 <div ng-app="app" ng-view>
-Coucou
+</div>
 </div>
 {% endblock body %}
 
@@ -12,6 +16,8 @@ Coucou
 <script src="bower_components/angular-animate/angular-animate.min.js"></script>
 <script src="bower_components/angular-aria/angular-aria.min.js"></script>
 <script src="bower_components/angular-route/angular-route.min.js"></script>
+
+<script src="/socket.io/socket.io.js"></script>
 
 <script src="scripts/app.js"></script>
 <script src="scripts/controllers/main.js"></script>

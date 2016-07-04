@@ -1,0 +1,107 @@
+@grey: #dddddd;
+/*@grey: #efefef;*/
+@darkGrey: #333;
+
+@font-face {
+  font-family: 'Myriad Set Pro';
+    src: url("fonts/Myriad-Set-Pro/myriad-set-pro_thin.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Myriad Set Pro';
+    src: url("fonts/Myriad-Set-Pro/myriad-set-pro_text.woff") format("woff");
+  font-weight: bold;
+  font-style: normal;
+}
+
+html, body {
+    padding: 0;
+    margin: 0;
+
+    font-family: 'Myriad Set Pro';
+    color: @darkGrey;
+}
+
+.main {
+    max-width: 980px;
+    margin: auto;
+    padding-top: 30px;
+}
+
+.nav {
+    max-width: 980px;
+    margin: auto;
+    padding: 18px 0px;
+    border-bottom: 1px solid @grey;
+
+    &-title {
+        margin: 0;
+        padding: 0;
+        font-weight: normal;
+        font-size: 30px;
+    }
+}
+
+.canvas {
+
+    &-container {
+        text-align: center;
+    }
+
+    margin: 20px;
+    margin: auto;
+
+    border: 1px solid @grey;
+    display: inline-block;
+    border-radius: 4px;
+}
+
+.button {
+    background: transparent;
+    border: 1px solid transparent;
+    /*border: 1px solid @grey;*/
+    border-radius: 4px;
+    outline: none;
+    padding: 9px;
+    font-size: 18px;
+    color: @darkGrey;
+    display: inline-block;
+    width: 41px;
+    height: 41px;
+
+    -webkit-transition: border-color 0.5s;
+    -o-transition: border-color 0.5s;
+    -moz-transition: border-color 0.5s;
+    transition: border-color 0.5s;
+
+    &:hover {
+        cursor: pointer;
+        border-color: #ccc;
+        /*border: 1px solid @grey;*/
+        color: black;
+    }
+
+    &-list {
+        text-align: center;
+        padding: 10px;
+    }
+}
+
+.log {
+    font-family: 'Cutive Mono';
+    background: #f2f9fc;
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid @grey;
+    width: 500px;
+    margin: auto;
+    text-align: left;
+    /*display: inline-block;*/
+
+    &-container {
+        text-align: center;
+
+    }
+}
