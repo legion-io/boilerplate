@@ -5,7 +5,7 @@ var path = require('path');
 
 var bots = {
     random: require('./bots/bot-random'),
-    map: require('./bots/bot-map')
+    'map-blind': require('./bots/bot-map-blind')
 };
 
 function Bot (opts) {
@@ -17,23 +17,24 @@ function Bot (opts) {
         opts = {};
     }
 
-    this.x = 0;
-    this.y = 0;
     this.finished = false;
-    this.count = 0;
+    this.speed = 200;
+    this.name = '';
 
     // to override
-    this.canMove = function (x,y) {
+    this.canMoveTo = function (direction) {
         return false;
     };
 
-    this.move = function (x,y, callback) {
+    // to override
+    this.updatePosition = function (direction) {};
+
+    this.moveTo = function (direction, callback) {
         setTimeout(function () {
-            bot.x = x;
-            bot.y = y;
+            bot.updatePosition(direction);
             bot.emit('moved');
             callback && callback();
-        }, 500);
+        }, bot.speed);
     };
 
     this.finish = function () {
@@ -41,28 +42,14 @@ function Bot (opts) {
         bot.emit('finished');
     };
 
-    if (opts.hasOwnProperty('x')) {
-        this.x = opts.x;
-    }
-
-    if (opts.hasOwnProperty('y')) {
-        this.y = opts.y;
-    }
-
     this.next = null;
     if (opts.hasOwnProperty('next')) {
         this.next  = bots[opts.next];
     }
 
     this.start = function () {
-        if (this.next != null && this.next != undefined) {
-            this.next(bot);
-        }
+        this.next && this.next(bot);
     };
-
-    this.serialize = function () {
-        return {x:bot.x, y:bot.y};
-    }
 
 }
 

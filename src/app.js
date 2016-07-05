@@ -4,10 +4,8 @@ var swig = require('swig');
 var app = express();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
-var Map = require('./map');
-var Bot = require('./bot');
 
-
+var Room = require('./room');
 
 app.set('view cache', false);
 // To disable Swig's cache, do the following:
@@ -32,36 +30,40 @@ server.listen(port, function (req, res) {
 });
 
 io.on('connection', function (socket) {
-    var map = new Map({width: 80, height: 40});
-    socket.emit('map', map.serialize());
+
+    var room = new Room();
+    
+    room.on('map-created', function (map) {
+        socket.emit('map', map);
+    });
+
+    room.on('bot-added', function (bot) {
+        socket.emit('bot-added', bot);
+    });
+
+    room.on('bot-moved', function (bot) {
+        socket.emit('bot-moved', bot);
+    });
+
+    room.on('scenario-finished', function () {
+        socket.emit('scenario-finished');
+    });
+
+    room.on('log', function (message) {
+        socket.emit('log', message);
+    });
+    
+    room.start();
 
     socket.on('play', function () {
-        socket.emit('map', map.serialize());
-        var bot = new Bot({x:5, y:5, next:'map'});
 
-        bot.canMove = function (x,y) {
-            var result =  map.contains(x,y);
-            return result;
-        };
+        room.clear(); 
+        room.start();
 
-        bot.start();
-
-        socket.emit('bot', bot.serialize());
-
-        bot.on('moved', function () {
-            socket.emit('bot-moved', bot.serialize());
-
-            socket.emit('log', 'wall-e: x:'+bot.x+' y:'+bot.y);
-            //console.log(bot.serialize());
-        });
-
-        bot.on('finished', function () {
-            socket.emit('scenario-finished'); 
-
-            socket.emit('log', 'wall-e: has finished');
-
-        });
+        room.addBot('random', 5, 5);
     });
+
+    /*socket.on('error', function (err) {
+        console.log(err);
+    });*/
 });
-
-

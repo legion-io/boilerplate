@@ -1,4 +1,7 @@
 function next (bot) {
+    if (bot.finished) {
+        return;
+    }
 
     if (bot.count == undefined) {
         bot.count = 0;
@@ -10,22 +13,31 @@ function next (bot) {
     }
 
     var horizontalMovement = ( Math.random() < 0.5 );
-    var add = ( Math.random() < 0.5 ? 1 : -1 );
+    var northOrWest = ( Math.random() < 0.5 );
 
-    var x = bot.x;
-    var y = bot.y;
+
+    var direction = '';
     if (horizontalMovement) {
-        x += add;
+        if (northOrWest) {
+            direction = 'west';
+        } else {
+            direction = 'east';
+        }
     } else {
-        y += add;
+        if (northOrWest) {
+            direction = 'north';
+        } else {
+            direction = 'south';
+        }
     }
 
-    if (bot.canMove(x,y)) {
+    if (bot.canMoveTo(direction)) {
         bot.count++;
-        bot.move(x,y, function(){
+        bot.moveTo(direction, function(){
             bot.next(bot);
         });
     } else {
+        bot.count++;
         bot.next(bot);
     }
 

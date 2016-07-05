@@ -7,8 +7,6 @@ function Map (opts) {
     this.width = 0;
     this.height = 0;
 
-    this.bots = {};
-
     if (opts.hasOwnProperty('width')) {
         this.width = opts.width;
     }
@@ -28,16 +26,6 @@ function Map (opts) {
     this.contains = function (x,y) {
         return x >= 0 && y >= 0 && x < this.width && y < this.height;
     },
-
-    this.addBot = function (bot, x, y) {
-        this.bots[bot] = {x:x, y:y};
-    }
-
-    this.botPositions = function () {
-        for(var key in this.bots) {
-            return this.bots[key];
-        }
-    }
 
     this.serialize = function () {
 

@@ -6,65 +6,74 @@ app.controller('MainCtrl', function($scope, socket){
     $scope.horizontalPitch = 0;
     $scope.verticalPitch = 0;
 
-    $scope.bot = null;
+    $scope.bots = {};
     $scope.map = null;
 
     $scope.paused = true;
     $scope.logs = [];
 
+    $scope.play = function () {
+        $scope.bots = {};
+        socket.emit('play');
+        $scope.paused = false;
+        $scope.logs = [];
+    };
+
     socket.on('map', function (map) {
-        //console.log(map);
+        console.log('map');
         $scope.map = map;
         $scope.displayCanvas(map);
-    });
-
-    socket.on('bot', function (bot) {
-        $scope.displayBot(bot);
-        $scope.bot = bot;
     });
 
     socket.on('log', function (log) {
         $scope.logs.push({message:log});
     });
 
-    $scope.play = function () {
-        socket.emit('play');
-        $scope.paused = false;
-    };
+    var i = 0;
 
+    socket.on('bot-added', function (bot) {
+        console.log('bot-added');
+        $scope.bots[bot.name] = {
+            color: (i==0?'black':'blue'),
+            position: bot.position
+        };
+        i++;
+        $scope.displayBot(bot);
+    });
     
     socket.on('bot-moved', function (bot) {
-        console.log('bot-moved '+JSON.stringify($scope.bot)+' '+JSON.stringify(bot) );
-        $scope.displayCanvas($scope.map);
-        //$scope.hideBot($scope.bot);
+        $scope.hideBot(bot);
+        $scope.bots[bot.name].position = bot.position;
         $scope.displayBot(bot);
     });
 
     socket.on('scenario-finished', function () {
+        console.log('scenario-finished');
         $scope.paused = true;
     });
 
     $scope.hideBot = function (bot) {
+        //console.log('hide');
         var canvas = document.getElementById('canvas');
         var contexte = canvas.getContext('2d');
 
-        contexte.fillStyle = "white";
+        //contexte.fillStyle = "white";
+        contexte.fillStyle = "#f2f9fc";
         contexte.fillRect(
-            bot.x*$scope.horizontalPitch, 
-            bot.y*$scope.verticalPitch,
+            $scope.bots[bot.name].position.x*$scope.horizontalPitch, 
+            $scope.bots[bot.name].position.y*$scope.verticalPitch,
             $scope.horizontalPitch, 
             $scope.verticalPitch);
-
     };
 
     $scope.displayBot = function (bot) {
         var canvas = document.getElementById('canvas');
         var contexte = canvas.getContext('2d');
 
-        contexte.fillStyle = "#333";
+        contexte.fillStyle = $scope.bots[bot.name].color;//"#333";
         contexte.fillRect(
-            bot.x*$scope.horizontalPitch, 
-            bot.y*$scope.verticalPitch,
+            bot.position.x*$scope.horizontalPitch, 
+            bot.position.y*$scope.verticalPitch,
             $scope.horizontalPitch, 
             $scope.verticalPitch);
     };
@@ -90,7 +99,7 @@ app.controller('MainCtrl', function($scope, socket){
         $scope.verticalPitch = $scope.canvasHeight/map[0].length;
         $scope.horizontalPitch = $scope.canvasWidth/map.length;
 
-        console.log('vPitch: '+$scope.verticalPitch+ ' hPitch:'+$scope.horizontalPitch);
+        //console.log('vPitch: '+$scope.verticalPitch+ ' hPitch:'+$scope.horizontalPitch);
 
         //contexte.fillStyle = "white";
         contexte.fillStyle = "#f2f9fc";
