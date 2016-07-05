@@ -2,7 +2,10 @@ var EventEmitter = require('events').EventEmitter;
 var util = require('util');
 var Map = require('./map');
 var Bot = require('./bot');
-var BotMapper = require('./bot-mapper');
+
+var botNames = require('./bot-names');
+var move = require('./move');
+
 
 function Room () {
 
@@ -10,7 +13,7 @@ function Room () {
     var room = this;
     this.map = null;
     this.bots = [];
-    this.botMapper = null;
+    this.positions = [];
     this.finished = false;
 
 
@@ -18,28 +21,59 @@ function Room () {
         console.log('start');
         this.finished = false;
         this.bots = [];
+        this.positions = [];
         this.map = new Map({width: 20, height: 20});
-        this.botMapper = new BotMapper(room.map);
         room.emit('map-created', room.map.serialize());
     };
 
     this.serializeBot = function (bot) {
-        return {name:bot.name, position:room.botMapper.position(bot)};
+        return {name:bot.name, position:room.positions[bot.name]};
     };
 
     this.addBot = function (type, x, y) {
-        console.log('addBot ' +type+' '+x+' '+y);
-        var bot = new Bot({next: type});
-        this.botMapper.addBot(bot, x, y);
-        this.bots.push(bot);
-        bot.start();
 
-        bot.on('moved', function () {
-            room.emit('bot-moved', room.serializeBot(bot));
-        });
+        if (room.map == null) {
+            throw 'map not defined';
+        }
+        
+        if (!room.map.contains(x,y)) {
+            throw 'bot not in the map';
+        }
+
+        console.log('addBot ' +type+' '+x+' '+y);
+
+        var bot = new Bot({next: type});
+        bot.name = botNames.findName();
+        room.bots.push(bot);
+        room.positions[bot.name] = {x:x, y:y};
+
+        bot.canMoveTo = function (direction) {
+            //console.log('canMoveTo');
+            var position = room.positions[bot.name];
+            //console.log(position);
+            var newPosition = move.from(position).to(direction); 
+            //var newPosition = move.to(direction)(position); 
+            //console.log(newPosition);
+            var canMove =  room.map.contains(newPosition.x,newPosition.y);
+            //console.log(canMove);
+            return canMove;
+        };
+
+        bot.updatePosition = function (direction) {
+            d
+            //var newPosition = move.to(direction)(position); 
+            var newPosition = move.from(position).to(direction); 
+            room.positions[bot.name] = newPosition;
+        };
+        
+        bot.start();
 
         bot.on('speak', function (message) {
             room.emit('log', bot.name+': '+message);
+        });
+
+        bot.on('moved', function () {
+            room.emit('bot-moved', room.serializeBot(bot));
         });
 
         bot.on('finished', function () {
@@ -65,9 +99,12 @@ function Room () {
             room.bots[i].finish();
         }
 
+        delete room.bots;
+        delete room.map;
+        delete room.positions;
         room.bots = [];
         room.map = [];
-        room.botMapper = null;
+        room.positions = [];
     };
 }
 
