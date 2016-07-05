@@ -5,7 +5,6 @@
   "main": "src/app.js",
   "scripts": {
     "start": "node src/app.js",
-    "prestart": "npm install && grunt less && cd views/static/ && bower install ",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
